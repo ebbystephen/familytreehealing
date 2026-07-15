@@ -1,4 +1,5 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap');
 
 #submitBtn {
     margin-top: 20px;
@@ -34,7 +35,7 @@
     }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Noto Sans Malayalam', Arial, sans-serif;
     background-color: #f7f9fc;
     padding: 20px;
 }
@@ -63,8 +64,11 @@ body {
 
     .emoji-item label {
         flex: 2;
-        font-weight: bold;
+        font-weight: 600;
         color: #333;
+        font-family: 'Noto Sans Malayalam', Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
     }
 
     .emoji-item input[type="text"] {
@@ -98,11 +102,19 @@ body {
         }
 
 .header {
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 28px;
+    font-weight: 700;
     color: #007bff;
     text-align: center;
     margin-bottom: 20px;
+    font-family: 'Noto Sans Malayalam', Arial, sans-serif;
+}
+
+h1 {
+    font-family: 'Noto Sans Malayalam', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    color: #1a5490;
 }
 
 .clickable {
@@ -139,6 +151,10 @@ body {
     max-height: 90%;
     overflow-y: auto; /* Enable scrolling within the content box */
     text-align: center;
+    font-family: 'Noto Sans Malayalam', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #333;
 }
 
 /* Close button (fixed at bottom) */
@@ -320,9 +336,9 @@ body {
 }
 */
 
-.close-icon{
-   color:grey;
-   position:fixed;
-   right:0px;
-   top:0px;
+.close-icon {
+    color: grey;
+    position: fixed;
+    right: 0px;
+    top: 0px;
 }
