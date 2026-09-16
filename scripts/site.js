@@ -1,4 +1,4 @@
-﻿
+ ﻿
 // Store emojis and associated text in a local variable
 const emojis = [
     {
@@ -146,7 +146,7 @@ const emojis = [
         `
     },
     {
-        emoji: "➕", text: "വി. ജെര്‍ത്രൂദിനോട് ഉള്ള പ്രാർത്ഥന", content: `
+        emoji: "✝️", text: "വി. ജെര്‍ത്രൂദിനോട് ഉള്ള പ്രാർത്ഥന", content: `
 
         <b>വി. ജെര്‍ത്രൂദിനോട് ഉള്ള പ്രാര്‍ത്ഥന</b><br />
 <p>
