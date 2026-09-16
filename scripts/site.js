@@ -162,7 +162,7 @@ const emojis = [
 // Font size settings
 const FONT_SCALE_KEY = 'fontScale';
 const FONT_SCALE_MIN = 0.8;
-const FONT_SCALE_MAX = 2.5;
+const FONT_SCALE_MAX = 2;
 const FONT_SCALE_STEP = 0.1;
 
 function getFontScale() {
@@ -173,11 +173,12 @@ function getFontScale() {
     return Math.min(FONT_SCALE_MAX, Math.max(FONT_SCALE_MIN, scale));
 }
 
-// Apply the font scale to the page and refresh the state of all font buttons
+// Apply the font scale to the page and refresh the font size controls
 function applyFontScale(scale) {
     document.documentElement.style.setProperty('--font-scale', scale);
-    document.querySelectorAll('.font-decrease').forEach(btn => btn.disabled = scale <= FONT_SCALE_MIN);
-    document.querySelectorAll('.font-increase').forEach(btn => btn.disabled = scale >= FONT_SCALE_MAX);
+    document.getElementById('fontScaleValue').textContent = `${Math.round(scale * 100)}%`;
+    document.getElementById('fontDecreaseBtn').disabled = scale <= FONT_SCALE_MIN;
+    document.getElementById('fontIncreaseBtn').disabled = scale >= FONT_SCALE_MAX;
 }
 
 function changeFontScale(delta) {
@@ -189,36 +190,15 @@ function changeFontScale(delta) {
     applyFontScale(scale);
 }
 
-// Create A- / A+ buttons for changing the font size
-function createFontControls() {
-    const container = document.createElement('div');
-    container.classList.add('font-controls');
+document.getElementById('fontDecreaseBtn').addEventListener('click', function () {
+    changeFontScale(-FONT_SCALE_STEP);
+});
 
-    const decreaseButton = document.createElement('button');
-    decreaseButton.type = 'button';
-    decreaseButton.classList.add('font-decrease');
-    decreaseButton.textContent = 'A-';
-    decreaseButton.title = 'Decrease font size';
-    decreaseButton.onclick = function () {
-        changeFontScale(-FONT_SCALE_STEP);
-    };
+document.getElementById('fontIncreaseBtn').addEventListener('click', function () {
+    changeFontScale(FONT_SCALE_STEP);
+});
 
-    const increaseButton = document.createElement('button');
-    increaseButton.type = 'button';
-    increaseButton.classList.add('font-increase');
-    increaseButton.textContent = 'A+';
-    increaseButton.title = 'Increase font size';
-    increaseButton.onclick = function () {
-        changeFontScale(FONT_SCALE_STEP);
-    };
-
-    container.appendChild(decreaseButton);
-    container.appendChild(increaseButton);
-    return container;
-}
-
-// Add font controls to the top bar and apply the stored font size
-document.querySelector('.top-bar').appendChild(createFontControls());
+// Apply the stored font size
 applyFontScale(getFontScale());
 
 // Function to save to local storage
@@ -254,15 +234,24 @@ function generateEmojiForm() {
 
         if (item.content != "") {
             label.classList.add('clickable');
+            label.tabIndex = 0;
+            label.setAttribute('role', 'button');
             label.onclick = function () {
                 showPopup(item.content);
+            };
+            label.onkeydown = function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    showPopup(item.content);
+                }
             };
         }
 
         // Create - button
         const minusButton = document.createElement('button');
         minusButton.type = 'button';
-        minusButton.textContent = '-';
+        minusButton.textContent = '−';
+        minusButton.setAttribute('aria-label', `Decrease count for ${item.text}`);
         minusButton.onclick = function () {
             const countInput = document.getElementById(`count${index}`);
             let currentValue = parseInt(countInput.value);
@@ -278,11 +267,13 @@ function generateEmojiForm() {
         numberInput.value = 0;
         numberInput.readOnly = true;
         numberInput.id = `count${index}`;
+        numberInput.setAttribute('aria-label', `Count for ${item.text}`);
 
         // Create + button
         const plusButton = document.createElement('button');
         plusButton.type = 'button';
         plusButton.textContent = '+';
+        plusButton.setAttribute('aria-label', `Increase count for ${item.text}`);
         plusButton.onclick = function () {
             const countInput = document.getElementById(`count${index}`);
             let currentValue = parseInt(countInput.value);
@@ -290,11 +281,16 @@ function generateEmojiForm() {
             saveToLocalStorage();
         };
 
+        // Group the counter controls so they wrap below the label together
+        const counter = document.createElement('div');
+        counter.classList.add('counter');
+        counter.appendChild(minusButton);
+        counter.appendChild(numberInput);
+        counter.appendChild(plusButton);
+
         // Append elements to the emojiDiv
         emojiDiv.appendChild(label);
-        emojiDiv.appendChild(minusButton);
-        emojiDiv.appendChild(numberInput);
-        emojiDiv.appendChild(plusButton);
+        emojiDiv.appendChild(counter);
 
         // Append emojiDiv to the form
         form.appendChild(emojiDiv);
@@ -307,45 +303,62 @@ function generateEmojiForm() {
 function showPopup(content) {
     const popup = document.createElement('div');
     popup.classList.add('popup');
+    popup.setAttribute('role', 'dialog');
+    popup.setAttribute('aria-modal', 'true');
 
     // Create content container
     const contentContainer = document.createElement('div');
     contentContainer.classList.add('popup-content');
-    contentContainer.innerHTML = content;
 
-    // Create a close button
-    const closeButton = document.createElement('button');
-    closeButton.classList.add('close-btn');
-    closeButton.textContent = 'Close';
-    closeButton.onclick = function () {
-        document.body.removeChild(popup);
-    };
+    function closePopup() {
+        popup.remove();
+        document.body.classList.remove('popup-open');
+        document.removeEventListener('keydown', onKeyDown);
+    }
 
-    // Add the close button to the content container
-    contentContainer.appendChild(closeButton);
+    function onKeyDown(event) {
+        if (event.key === 'Escape') {
+            closePopup();
+        }
+    }
+
+    // Header with close icon (stays visible while the prayer scrolls)
+    const header = document.createElement('div');
+    header.classList.add('popup-header');
 
     const closeIcon = document.createElement('button');
+    closeIcon.type = 'button';
     closeIcon.classList.add('close-icon');
-    closeIcon.textContent = 'X';
-    closeIcon.onclick = function () {
-        document.body.removeChild(popup);
-    };
+    closeIcon.textContent = '✕';
+    closeIcon.setAttribute('aria-label', 'Close');
+    closeIcon.onclick = closePopup;
+    header.appendChild(closeIcon);
 
-    //Add the close icon to the popup
-    //popup.appendChild(closeIcon);
-    contentContainer.prepend(closeIcon);
+    // Scrollable prayer text
+    const body = document.createElement('div');
+    body.classList.add('popup-body');
+    body.innerHTML = content;
 
-    // Add font size controls at the top of the prayer
-    contentContainer.prepend(createFontControls());
+    // Footer with close button
+    const footer = document.createElement('div');
+    footer.classList.add('popup-footer');
 
-    // Add the close button to the popup
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.classList.add('close-btn');
+    closeButton.textContent = 'Close';
+    closeButton.onclick = closePopup;
+    footer.appendChild(closeButton);
+
+    contentContainer.appendChild(header);
+    contentContainer.appendChild(body);
+    contentContainer.appendChild(footer);
     popup.appendChild(contentContainer);
 
-    // Append popup to body
+    // Append popup to body and stop the page behind it from scrolling
     document.body.appendChild(popup);
-    applyFontScale(getFontScale());
-    //document.body.appendChild(closeButton);
-
+    document.body.classList.add('popup-open');
+    document.addEventListener('keydown', onKeyDown);
 }
 
 // Call the function to generate the form
@@ -486,8 +499,12 @@ document.getElementById('copyButton').onclick = function () {
     // Remove the temporary textarea
     document.body.removeChild(tempTextArea);
 
-    // Optional: Give feedback to the user
-    //alert('Copied to clipboard');
+    // Give feedback to the user
+    const copyButton = document.getElementById('copyButton');
+    copyButton.textContent = 'Copied ✓';
+    setTimeout(function () {
+        copyButton.textContent = 'Copy';
+    }, 2000);
 };
 function openTab(evt, tabName) {
     const tabcontents = document.querySelectorAll('.tabcontent');

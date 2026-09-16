@@ -1,66 +1,153 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap');
 
+/*
+ * All sizes use rem, so the whole page (text, buttons, heading, popup)
+ * grows together when --font-scale changes. --font-scale is set by site.js
+ * and stored in localStorage.
+ */
 :root {
-    --font-scale: 1; /* Updated by site.js and stored in localStorage */
+    --font-scale: 1;
+    --color-primary: #0b63c5;
+    --color-primary-dark: #084c97;
+    --color-heading: #1a5490;
+    --color-success: #2e7d32;
+    --color-success-dark: #1b5e20;
+    --color-danger: #c62828;
+    --color-danger-dark: #8e1c1c;
+    --color-text: #222;
+    --color-muted: #555;
+    --color-border: #dde3ea;
+    --color-bg: #f4f6f9;
+    --color-surface: #fff;
+    --radius: 0.5rem;
+    --tap-size: min(2.75rem, 72px); /* Comfortable touch target, capped so rows fit on phones */
 }
 
-#submitBtn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 
-#result {
-    margin-top: 20px;
-    font-weight: bold;
-    font-size: calc(16px * var(--font-scale));
+html {
+    font-size: calc(100% * var(--font-scale));
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
-
-#submitBtn, #resetBtn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    width: 150px; /* Set a fixed width */
-    height: 50px; /* Set a fixed height */
-    background-color: #4CAF50; /* Background color */
-    color: white; /* Text color */
-    border: none; /* Remove border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-}
-
-#resetBtn {
-    background-color: #f44336; /* Different background color for reset */
-}
-
-    /* Add hover effects */
-    #submitBtn:hover, #resetBtn:hover {
-        opacity: 0.9;
-    }
 
 body {
+    margin: 0;
+    padding: 0 0 2rem;
     font-family: 'Noto Sans Malayalam', Arial, sans-serif;
-    background-color: #f7f9fc;
-    padding: 20px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    overflow-wrap: anywhere; /* Break long words instead of widening the page */
 }
 
-.container {
-    max-width: 600px;
+    body.popup-open {
+        overflow: hidden;
+    }
+
+button, input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+    overflow-wrap: normal;
+    white-space: nowrap;
+}
+
+    button:focus-visible,
+    .clickable:focus-visible {
+        outline: 3px solid #ffb300;
+        outline-offset: 2px;
+    }
+
+/* ---------- Top bar ---------- */
+
+.top-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-surface);
+    border-bottom: 3px solid var(--color-primary);
+}
+
+    .top-bar h1 {
+        margin: 0;
+        font-family: 'Noto Sans Malayalam', Arial, sans-serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1.3;
+        color: var(--color-heading);
+    }
+
+.font-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+    .font-controls button {
+        width: var(--tap-size);
+        height: var(--tap-size);
+        padding: 0;
+        border: 2px solid var(--color-primary);
+        border-radius: var(--radius);
+        background-color: var(--color-surface);
+        color: var(--color-primary);
+        font-size: min(1.125rem, 26px);
+        font-weight: 700;
+        line-height: 1;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+        .font-controls button:hover:not(:disabled) {
+            background-color: var(--color-primary);
+            color: #fff;
+        }
+
+        .font-controls button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+.font-scale-value {
+    min-width: 3.5em;
+    text-align: center;
+    font-size: min(0.95rem, 18px);
+    font-weight: 600;
+    color: var(--color-muted);
+}
+
+/* ---------- Main content ---------- */
+
+main {
+    max-width: 48rem;
     margin: 0 auto;
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+}
+
+#emojiForm {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    overflow: hidden;
 }
 
 .emoji-item {
     display: flex;
-    align-items: center;
+    flex-wrap: wrap; /* Counter moves below the label when space is short */
     justify-content: space-between;
-    margin-bottom: 15px;
-    padding: 10px;
-    border-bottom: 1px solid #e0e0e0;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border);
 }
 
     .emoji-item:last-child {
@@ -68,158 +155,264 @@ body {
     }
 
     .emoji-item label {
-        flex: 2;
-        font-weight: 600;
-        color: #333;
+        flex: 1 1 12rem;
+        min-width: 0;
         font-family: 'Noto Sans Malayalam', Arial, sans-serif;
-        font-size: calc(16px * var(--font-scale));
+        font-size: 1.0625rem;
+        font-weight: 600;
         line-height: 1.5;
+        color: var(--color-text);
     }
 
-    .emoji-item input[type="text"] {
-        width: 50px;
-        text-align: center;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        margin: 0 10px;
-        background-color: #f0f0f0;
-        color: #333;
-    }
-
-    .emoji-item button {
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s ease;
-    }
-
-        .emoji-item button:hover {
-            background-color: #0056b3;
-        }
-
-        .emoji-item button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-.header {
-    font-size: 28px;
-    font-weight: 700;
-    color: #007bff;
-    text-align: center;
-    margin-bottom: 20px;
-    font-family: 'Noto Sans Malayalam', Arial, sans-serif;
-}
-
-h1 {
-    font-family: 'Noto Sans Malayalam', Arial, sans-serif;
-    font-weight: 700;
-    font-size: 28px;
-    color: #1a5490;
-}
-
-.clickable {
+.emoji-item label.clickable {
     cursor: pointer;
-    color: #007bff;
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-decoration-color: rgba(11, 99, 197, 0.35);
+    text-underline-offset: 0.2em;
 }
 
     .clickable:hover {
-        text-decoration: underline;
+        text-decoration-color: currentColor;
     }
 
-/* Popup container */
+.counter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    flex: 0 0 auto;
+}
+
+    .counter button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--tap-size);
+        height: var(--tap-size);
+        padding: 0;
+        border: none;
+        border-radius: var(--radius);
+        background-color: var(--color-primary);
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        transition: background-color 0.2s ease;
+    }
+
+        .counter button:hover {
+            background-color: var(--color-primary-dark);
+        }
+
+    .counter input[type="text"] {
+        width: min(3rem, 72px);
+        height: var(--tap-size);
+        padding: 0;
+        text-align: center;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius);
+        background-color: #f0f3f7;
+        color: var(--color-text);
+        font-size: 1.125rem;
+        font-weight: 700;
+    }
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+#submitBtn, #resetBtn {
+    flex: 1 1 9rem;
+    min-height: 3rem;
+    padding: 0.6rem 1.25rem;
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-size: 1.125rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+#submitBtn {
+    background-color: var(--color-success);
+}
+
+    #submitBtn:hover {
+        background-color: var(--color-success-dark);
+    }
+
+#resetBtn {
+    background-color: var(--color-danger);
+}
+
+    #resetBtn:hover {
+        background-color: var(--color-danger-dark);
+    }
+
+#result {
+    margin-top: 1.25rem;
+    font-size: 1.125rem;
+    font-weight: bold;
+}
+
+#copyButton {
+    margin-top: 0.75rem;
+    min-height: var(--tap-size);
+    padding: 0.4rem 1.5rem;
+    border: none;
+    border-radius: var(--radius);
+    background-color: var(--color-primary);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+    #copyButton:hover {
+        background-color: var(--color-primary-dark);
+    }
+
+/* ---------- Prayer popup ---------- */
+
 .popup {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
-    /*padding: 20px;*/
     z-index: 1000;
-    overflow-y: auto; /* Enable vertical scrolling */
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.75);
 }
 
-/* Popup content container */
 .popup-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 90%;
-    max-height: 90%;
-    overflow-y: auto; /* Enable scrolling within the content box */
-    text-align: center;
-    font-family: 'Noto Sans Malayalam', Arial, sans-serif;
-    font-size: calc(15px * var(--font-scale));
-    line-height: 1.8;
-    color: #333;
-}
-
-/* Font size controls (top bar and prayer popup) */
-.font-controls {
     display: flex;
-    gap: 6px;
+    flex-direction: column;
+    width: 100%;
+    max-width: 48rem;
+    max-height: 100%;
+    overflow: hidden;
+    background-color: var(--color-surface);
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-    .font-controls button {
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: 700;
-        min-width: 40px;
-        padding: 5px 8px;
-        line-height: 1.2;
+.popup-header {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.25rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.popup-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 1rem 1.25rem;
+    font-family: 'Noto Sans Malayalam', Arial, sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.9;
+    color: var(--color-text);
+}
+
+    .popup-body b {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+        line-height: 1.6;
+        color: var(--color-heading);
     }
 
-        .font-controls button:hover {
-            background-color: #0056b3;
+        .popup-body b + br {
+            display: none;
         }
 
-        .font-controls button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
+    .popup-body p {
+        margin: 0;
+    }
 
-.popup-content .font-controls {
-    position: sticky; /* Stays visible while scrolling a long prayer */
-    top: -20px;
-    margin: -20px -20px 10px;
-    padding: 8px 20px;
-    background-color: #fff;
-    border-bottom: 1px solid #e0e0e0;
+.popup-footer {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--color-border);
 }
 
-/* Close button (fixed at bottom) */
+.close-icon {
+    width: var(--tap-size);
+    height: var(--tap-size);
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: transparent;
+    color: var(--color-muted);
+    font-size: 1.5rem;
+    line-height: 1;
+    transition: background-color 0.2s ease;
+}
+
+    .close-icon:hover {
+        background-color: #eef1f5;
+        color: var(--color-text);
+    }
+
 .close-btn {
-    background-color: #007bff;
-    color: #fff;
+    min-width: 8rem;
+    min-height: var(--tap-size);
+    padding: 0.5rem 1.5rem;
     border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
+    border-radius: var(--radius);
+    background-color: var(--color-primary);
+    color: #fff;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
 }
 
-/*.popup button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
-}*/
+    .close-btn:hover {
+        background-color: var(--color-primary-dark);
+    }
 
+/* Small screens: fixed spacing so large text gets the most room */
+@media (max-width: 480px) {
+    .top-bar {
+        padding: 10px 12px;
+    }
+
+    main {
+        padding: 12px 10px;
+    }
+
+    .emoji-item {
+        gap: 8px 12px;
+        padding: 12px;
+    }
+
+    .counter {
+        gap: 6px;
+    }
+
+    .popup {
+        padding: 8px;
+    }
+
+    .popup-body {
+        padding: 12px 16px;
+    }
+}
+
+/* ---------- Currently unused (WhatsApp number popup, phone icon, tabs) ---------- */
 
 .ph-popup {
     position: fixed;
@@ -270,38 +463,19 @@ h1 {
     color: white;
 }
 
-
-
-.top-bar {
-    display: flex;
-    justify-content: space-between; /* Space between h1 and icon */
-    align-items: center; /* Align items vertically centered */
-    padding: 10px 20px; /* Padding around the top bar */
-    background-color: #f7f9fc; /* Light background for the top bar */
-    border-bottom: 2px solid #007bff; /* Optional: Add a border at the bottom */
-}
-
-    /* H1 header styling */
-    .top-bar h1 {
-        margin: 0; /* Remove default margin */
-        font-size: 24px; /* Font size for the header */
-        color: #333; /* Header color */
-    }
-
-/* Phone icon styling */
 .phone-icon {
-    background-color: #25D366; /* Blue background #007bff;*/
-    color: white; /* White icon color */
+    background-color: #25D366;
+    color: white;
     padding: 5px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 16px; /* Smaller size */
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Subtle shadow */
+    font-size: 16px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s ease;
 }
 
     .phone-icon:hover {
-        background-color: #0056b3; /* Darker blue on hover */
+        background-color: #0056b3;
     }
 
     .phone-icon span {
@@ -309,23 +483,6 @@ h1 {
         display: block;
         padding-left: 5px;
         font-size: 21px;
-    }
-
-
-#copyButton {
-    margin-top: 10px;
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-}
-
-    #copyButton:hover {
-        background-color: #0056b3;
     }
 
 .tab {
@@ -344,18 +501,15 @@ h1 {
         font-size: 10.5px;
     }
 
-        /* Change background color of tabs on hover */
         .tab button:hover {
             background-color: #ddd;
         }
 
-        /* Create an active/current tablink class */
         .tab button.active {
             background-color: #007bff;
             color: white;
         }
 
-/* Style the tab content */
 .tabcontent {
     display: none;
     padding: 20px;
@@ -363,24 +517,6 @@ h1 {
     border-top: none;
 }
 
-    /* Show the first tab content by default */
     .tabcontent.active {
         display: block;
     }
-
-/* Media query for small screens */
-/*@media screen and (max-width: 600px) {
-    .tab button {
-        width: 100%;
-        padding: 8px 15px;
-        font-size: 14px;
-    }
-}
-*/
-
-.close-icon {
-    color: grey;
-    position: fixed;
-    right: 0px;
-    top: 0px;
-}

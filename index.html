@@ -1,23 +1,39 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Family tree healing</title>
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-    <link type="text/css" rel="stylesheet" href="styles/site.css?v=2.7" />
+    <!-- Apply the saved text size before the page draws, to avoid a size jump -->
+    <script>
+        try {
+            var savedScale = parseFloat(localStorage.getItem('fontScale'));
+            if (savedScale) document.documentElement.style.setProperty('--font-scale', savedScale);
+        } catch (e) { }
+    </script>
+    <link type="text/css" rel="stylesheet" href="styles/site.css?v=2.8" />
 </head>
 <body>
-    <div class="top-bar">
+    <header class="top-bar">
         <h1>Family tree healing</h1>
         <!--<div class="phone-icon" id="phoneIcon"><span>✆</span></div>-->
-    </div>
-    <form id="emojiForm"></form>
-    <button type="button" id="submitBtn">Submit</button>
-    <button type="button" id="resetBtn">Reset</button>
-    <div id="result"></div>
-    <button id="copyButton" style="display:none;">Copy</button>
+        <div class="font-controls" role="group" aria-label="Text size">
+            <button type="button" id="fontDecreaseBtn" aria-label="Decrease text size" title="Decrease text size">A−</button>
+            <span id="fontScaleValue" class="font-scale-value" aria-live="polite">100%</span>
+            <button type="button" id="fontIncreaseBtn" aria-label="Increase text size" title="Increase text size">A+</button>
+        </div>
+    </header>
+    <main>
+        <form id="emojiForm"></form>
+        <div class="actions">
+            <button type="button" id="submitBtn">Submit</button>
+            <button type="button" id="resetBtn">Reset</button>
+        </div>
+        <div id="result"></div>
+        <button type="button" id="copyButton" style="display:none;">Copy</button>
+    </main>
     <!-- Phone icon -->
-    <script type="text/javascript" src="scripts/site.js?v=5.3"></script>
+    <script type="text/javascript" src="scripts/site.js?v=5.4"></script>
 </body>
 </html>
