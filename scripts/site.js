@@ -159,6 +159,68 @@ const emojis = [
     }
 ];
 
+// Font size settings
+const FONT_SCALE_KEY = 'fontScale';
+const FONT_SCALE_MIN = 0.8;
+const FONT_SCALE_MAX = 2.5;
+const FONT_SCALE_STEP = 0.1;
+
+function getFontScale() {
+    let scale = 1;
+    try {
+        scale = parseFloat(localStorage.getItem(FONT_SCALE_KEY)) || 1;
+    } catch (e) { }
+    return Math.min(FONT_SCALE_MAX, Math.max(FONT_SCALE_MIN, scale));
+}
+
+// Apply the font scale to the page and refresh the state of all font buttons
+function applyFontScale(scale) {
+    document.documentElement.style.setProperty('--font-scale', scale);
+    document.querySelectorAll('.font-decrease').forEach(btn => btn.disabled = scale <= FONT_SCALE_MIN);
+    document.querySelectorAll('.font-increase').forEach(btn => btn.disabled = scale >= FONT_SCALE_MAX);
+}
+
+function changeFontScale(delta) {
+    let scale = Math.round((getFontScale() + delta) * 10) / 10;
+    scale = Math.min(FONT_SCALE_MAX, Math.max(FONT_SCALE_MIN, scale));
+    try {
+        localStorage.setItem(FONT_SCALE_KEY, scale);
+    } catch (e) { }
+    applyFontScale(scale);
+}
+
+// Create A- / A+ buttons for changing the font size
+function createFontControls() {
+    const container = document.createElement('div');
+    container.classList.add('font-controls');
+
+    const decreaseButton = document.createElement('button');
+    decreaseButton.type = 'button';
+    decreaseButton.classList.add('font-decrease');
+    decreaseButton.textContent = 'A-';
+    decreaseButton.title = 'Decrease font size';
+    decreaseButton.onclick = function () {
+        changeFontScale(-FONT_SCALE_STEP);
+    };
+
+    const increaseButton = document.createElement('button');
+    increaseButton.type = 'button';
+    increaseButton.classList.add('font-increase');
+    increaseButton.textContent = 'A+';
+    increaseButton.title = 'Increase font size';
+    increaseButton.onclick = function () {
+        changeFontScale(FONT_SCALE_STEP);
+    };
+
+    container.appendChild(decreaseButton);
+    container.appendChild(increaseButton);
+    return container;
+}
+
+// Add font controls to the top bar and apply the stored font size
+document.querySelector('.top-bar').appendChild(createFontControls());
+applyFontScale(getFontScale());
+
 // Function to save to local storage
 
 function saveToLocalStorage() {
@@ -273,11 +335,15 @@ function showPopup(content) {
     //popup.appendChild(closeIcon);
     contentContainer.prepend(closeIcon);
 
+    // Add font size controls at the top of the prayer
+    contentContainer.prepend(createFontControls());
+
     // Add the close button to the popup
     popup.appendChild(contentContainer);
 
     // Append popup to body
     document.body.appendChild(popup);
+    applyFontScale(getFontScale());
     //document.body.appendChild(closeButton);
 
 }
